@@ -5,6 +5,7 @@ import './App.css';
 import {Navbar} from "./components/navbar";
 import LoginPage from "./pages/login";
 import ShopPage from "./pages/shop";
+import BookDetailsPage from "./pages/book-details";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
               <Route path="/purchased-items"/>
               <Route path="/wishlist"/>
               <Route path="/add_book"/>
+              <Route path="/books/:id" element={<BookDetailsPage />} />
           </Routes>
       </Router>
     </div>
