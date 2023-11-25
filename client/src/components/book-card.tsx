@@ -1,10 +1,12 @@
-import {Card, CardContent, Typography, CardActions, Button, CardActionArea} from "@mui/material";
+import {Card, CardContent, Typography, CardActions, Button, CardActionArea, ButtonProps} from "@mui/material";
 import CardMedia from '@mui/material/CardMedia';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import {Link, useNavigate} from 'react-router-dom';
 import {Book} from "../shared/types";
 import {styled} from "@mui/system";
 import React, {useState} from "react";
+import {purple} from "@mui/material/colors";
+import {AddShoppingCart} from "@mui/icons-material";
 
 const StyledCard = styled(Card)({
     maxWidth: 350,
@@ -38,6 +40,9 @@ const CenteredCardActions = styled(CardActions)({
     justifyContent: 'center',
     alignItems: 'center',
 });
+
+
+
 export const BookCard = ({book}: { book: Book }) => {
     console.log("BOOOK", book);
     const navigate = useNavigate();
@@ -71,39 +76,6 @@ export const BookCard = ({book}: { book: Book }) => {
 
     //TODO when click book open the book page
 
-    // return (
-    //     <StyledCard onClick={handleCardClick}>
-    //         {/*<Link to={`/books/${book.id}`} style={{ textDecoration: 'none', color: 'inherit' }} onClick={handleCardClick}>*/}
-    //         {/*<CardContent>*/}
-    //         <CardContentWrapper>
-    //             <ImageWrapper>
-    //                 <img src={genreImageURL} alt={book.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-    //             </ImageWrapper>
-    //             <Typography variant="h5" component="div" gutterBottom>
-    //                 {book.title}
-    //             </Typography>
-    //             <Typography color="textSecondary" gutterBottom>
-    //                 Author: {book.author}
-    //             </Typography>
-    //             <Typography variant="body2" component="p">
-    //                 Price: ${book.price.toFixed(2)}
-    //             </Typography>
-    //             <Typography variant="body2" component="p">
-    //                 {book.stock === 0 ? 'Out of Stock' : `In Stock`}
-    //             </Typography>
-    //         </CardContentWrapper>
-    //         <Button color="primary" onClick={handleAddToCart} sx={{ marginTop: 'auto' }}>
-    //             Add to Cart
-    //         </Button>
-    //         {/*</CardContent>*/}
-    //         {/*</Link>*/}
-    //         {/*<CardActions>*/}
-    //         {/*    <Button component={Link} to={`/books/${book.id}`} size="small">View Details</Button>*/}
-    //         {/*</CardActions>*/}
-    //     </StyledCard>
-    //     //</Card>
-    // );
-
     return (
         <Card sx={{ maxWidth: 345 }}>
             <CardActionArea onClick={handleCardClick}>
@@ -135,9 +107,15 @@ export const BookCard = ({book}: { book: Book }) => {
             <CenteredCardActions>
                 <Button
                     size="small"
-                    color="primary"
+                    startIcon={<AddShoppingCart/>}
                     onClick={handleAddToCart}
                     disabled={book.stock === 0}
+                    sx={{
+                        color: 'teal',
+                        '&:hover': {
+                            color: 'cadetblue',
+                        },
+                    }}
                 >
                     Add to basket
                 </Button>
