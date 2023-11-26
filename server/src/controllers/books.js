@@ -4,6 +4,8 @@ module.exports.getBookById=getBookById;
 module.exports.createBook=createBook;
 module.exports.deleteBook=deleteBook;
 module.exports.updateBook=updateBook;
+module.exports.getAllGenres=getAllGenres;
+module.exports.getBooksByGenre = getBooksByGenre;
 
 
 function getBooks(req,res,next){
@@ -77,6 +79,35 @@ function updateBook(req, res, next) {
             res.json({ data: updateBook });
         })
         .catch(err => {
+            console.log('Error', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+}
+
+function getAllGenres(req, res, next) {
+    console.log('GET all genres');
+
+    Book.distinct('genre')
+        .then(genres => {
+            return res.json({ data: genres });
+        })
+        .catch(err => {
+            console.log('Error', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+}
+
+function getBooksByGenre(req, res, next) {
+    const requestedGenre = req.params.genre;
+
+    // Use a regular expression for case-insensitive search
+    const genreRegex = new RegExp(requestedGenre, 'i');
+
+    Book.find({ genre: genreRegex })
+        .then((results) => {
+            return res.json({ data: results });
+        })
+        .catch((err) => {
             console.log('Error', err);
             res.status(500).json({ error: 'Internal Server Error' });
         });
