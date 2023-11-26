@@ -21,9 +21,14 @@ const GridContainer = styled(Box)({
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
     gap: '30px',
+    '& > *:nth-child(n)': {
+        marginLeft: '50px', // Adjust the value as needed
+    },
 });
 function ShopPage() {
     const [books, setBooks] = useState<Book[]>([]);
+    const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         fetch('http://localhost:3000/books')
@@ -42,6 +47,16 @@ function ShopPage() {
             })
             .catch((error) => console.error(error));
     }, []);
+
+    const handleBookClick = (book: Book) => {
+        setSelectedBook(book);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
     // return (
     //     <div>
     //         <h2>Book List</h2>
@@ -83,6 +98,7 @@ function ShopPage() {
                     <BookCard key={book._id} book={book} />
                 ))}
             </GridContainer>
+
         </Container>
     );
 

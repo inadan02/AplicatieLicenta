@@ -5,6 +5,7 @@ import {Book} from "../../shared/types"
 const BookDetailsPage = () => {
     const { id } = useParams();
     const [book, setBook] = useState<Book | null>(null);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         // Fetch book details using the id parameter
@@ -21,6 +22,10 @@ const BookDetailsPage = () => {
             .catch((error) => console.error(error));
     }, [id]);
 
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
     if (!book) {
         // Loading state, or you can show an error message
         return <p>Loading...</p>;
@@ -32,6 +37,7 @@ const BookDetailsPage = () => {
             <p>Title: {book.title}</p>
             <p>Author: {book.author}</p>
             <p>Genre: {book.genre}</p>
+            <p>Description: {book.description}</p>
             <p>Price: ${book.price.toFixed(2)}</p>
             <p>Stock: {book.stock}</p>
             {/* Display other book details here */}
