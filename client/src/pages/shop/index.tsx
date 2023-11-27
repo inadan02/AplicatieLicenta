@@ -39,6 +39,10 @@ const GridContainer = styled(Box)({
         marginLeft: '50px', // Adjust the value as needed
     },
 });
+
+const ColoredSlider = styled(Slider)({
+    color: 'cadetblue', // Set the color to cadetblue
+});
 function valuetext(price: number) {
     return `${price}$`;
 }
@@ -147,7 +151,7 @@ function ShopPage() {
         <Container>
             <Box sx={{ marginBottom: 2 }}>
                 <FormControl variant="standard" sx={{ minWidth: 140, marginBottom: 4  }}>
-                    <InputLabel id="genre-select-label">Filter By Genre</InputLabel>
+                    <InputLabel id="genre-select-label" >Filter By Genre</InputLabel>
                     <Select
                         labelId="genre-select-label"
                         id="genre-select"
@@ -165,7 +169,7 @@ function ShopPage() {
                 <Typography variant="subtitle1" gutterBottom sx={{ textAlign: 'left' }}>
                     Price Range:
                 </Typography>
-                <Slider
+                <ColoredSlider
                     getAriaLabel={() => 'Price range'}
                     value={price}
                     onChange={handleChange}
