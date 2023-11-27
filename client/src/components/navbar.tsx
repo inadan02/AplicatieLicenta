@@ -43,46 +43,45 @@ export const Navbar = () => {
     }
 
     const handleViewShop = () => {
-        //handle open wishlist
         navigate(`/`);
     }
 
-    const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
+    // const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
+    // const handleMenuClose = () => {
+    //     setAnchorEl(null);
+    // };
 
-    const handleGenreSelect = (genre: string) => {
-        // Handle the genre selection (you can navigate or filter books based on the selected genre)
-        console.log(`Selected genre: ${genre}`);
-        //setSelectedGenre(genre);
-
-        navigate(`/books/genres/${genre}`);
-        handleMenuClose();
-
-        // fetch(`http://localhost:3000/books/genres/${genre}`)
-        //     .then((response) => {
-        //         if (!response.ok) {
-        //             throw new Error('Network response was not ok');
-        //         }
-        //         return response.json();
-        //     })
-        //     .then((data) => {
-        //         if (Array.isArray(data.data)) {
-        //             console.log(data.data)
-        //             setGenres(data.data);
-        //         } else {
-        //             console.error('Data is not an array', data);
-        //         }
-        //     })
-        //     .catch((error) => console.error(error));
-        //
-        // setSelectedGenre(genre);
-        // handleMenuClose();
-    };
+    // const handleGenreSelect = (genre: string) => {
+    //     // Handle the genre selection (you can navigate or filter books based on the selected genre)
+    //     console.log(`Selected genre: ${genre}`);
+    //     setSelectedGenre(genre);
+    //
+    //     //navigate(`/books/genres/${genre}`);
+    //     handleMenuClose();
+    //
+    //     // fetch(`http://localhost:3000/books/genres/${genre}`)
+    //     //     .then((response) => {
+    //     //         if (!response.ok) {
+    //     //             throw new Error('Network response was not ok');
+    //     //         }
+    //     //         return response.json();
+    //     //     })
+    //     //     .then((data) => {
+    //     //         if (Array.isArray(data.data)) {
+    //     //             console.log(data.data)
+    //     //             setGenres(data.data);
+    //     //         } else {
+    //     //             console.error('Data is not an array', data);
+    //     //         }
+    //     //     })
+    //     //     .catch((error) => console.error(error));
+    //     //
+    //     // setSelectedGenre(genre);
+    //     // handleMenuClose();
+    // };
 
     // return <div className="navbar">
     //     <div className="navbar-title">
@@ -110,23 +109,25 @@ export const Navbar = () => {
     return <Box sx={{flexGrow: 1}}>
         <AppBar position="static">
             <Toolbar sx={{background: 'cadetblue'}}>
-                <IconButton
-                    size="large"
-                    edge="start"
-                    color="inherit"
-                    aria-label="menu"
-                    onClick={handleMenuClick}
-                    sx={{mr: 2}}
-                >
-                    <MenuIcon/>
-                </IconButton>
-                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                    {genres.map((genre) => (
-                        <MenuItem key={genre} onClick={() => handleGenreSelect(genre)}>
-                            {genre.charAt(0).toUpperCase() + genre.slice(1)}
-                        </MenuItem>
-                    ))}
-                </Menu>
+                {/*<Tooltip title="Genres">*/}
+                {/*    <IconButton*/}
+                {/*        size="large"*/}
+                {/*        edge="start"*/}
+                {/*        color="inherit"*/}
+                {/*        aria-label="menu"*/}
+                {/*        onClick={handleMenuClick}*/}
+                {/*        sx={{mr: 2}}*/}
+                {/*    >*/}
+                {/*        <MenuIcon/>*/}
+                {/*    </IconButton>*/}
+                {/*</Tooltip>*/}
+                {/*<Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>*/}
+                {/*    {genres.map((genre) => (*/}
+                {/*        <MenuItem key={genre} onClick={() => handleGenreSelect(genre)}>*/}
+                {/*            {genre.charAt(0).toUpperCase() + genre.slice(1)}*/}
+                {/*        </MenuItem>*/}
+                {/*    ))}*/}
+                {/*</Menu>*/}
                 <IconButton size="large" edge="start" color="inherit" onClick={handleViewShop} sx={{mr: 2}}>
                     Books
                 </IconButton>

@@ -6,6 +6,9 @@ module.exports.deleteBook=deleteBook;
 module.exports.updateBook=updateBook;
 module.exports.getAllGenres=getAllGenres;
 module.exports.getBooksByGenre = getBooksByGenre;
+module.exports.getBooksByPriceRange = getBooksByPriceRange;
+module.exports.getBooksByGenreAndPriceRange = getBooksByGenreAndPriceRange;
+
 
 
 function getBooks(req,res,next){
@@ -104,6 +107,58 @@ function getBooksByGenre(req, res, next) {
     const genreRegex = new RegExp(requestedGenre, 'i');
 
     Book.find({ genre: genreRegex })
+        .then((results) => {
+            return res.json({ data: results });
+        })
+        .catch((err) => {
+            console.log('Error', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+}
+
+function getBooksByPriceRange(req, res, next) {
+    const minPrice = req.params.minPrice;
+    const maxPrice = req.params.maxPrice;
+
+    // Validate that minPrice and maxPrice are numbers
+    if (isNaN(minPrice) || isNaN(maxPrice)) {
+        return res.status(400).json({ error: 'Invalid price values' });
+    }
+
+    // Convert minPrice and maxPrice to numbers
+    const minPriceNumber = parseFloat(minPrice);
+    const maxPriceNumber = parseFloat(maxPrice);
+
+    // Use the price range for the query
+    Book.find({ price: { $gte: minPriceNumber, $lte: maxPriceNumber } })
+        .then((results) => {
+            return res.json({ data: results });
+        })
+        .catch((err) => {
+            console.log('Error', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+}
+
+function getBooksByGenreAndPriceRange(req, res, next) {
+    const minPrice = req.params.minPrice;
+    const maxPrice = req.params.maxPrice;
+    const requestedGenre = req.params.genre;
+
+    // Validate that minPrice and maxPrice are numbers
+    if (isNaN(minPrice) || isNaN(maxPrice)) {
+        return res.status(400).json({ error: 'Invalid price values' });
+    }
+
+    // Convert minPrice and maxPrice to numbers
+    const minPriceNumber = parseFloat(minPrice);
+    const maxPriceNumber = parseFloat(maxPrice);
+
+    // Use the price range and genre for the query
+    Book.find({
+        price: { $gte: minPriceNumber, $lte: maxPriceNumber },
+        genre: { $regex: new RegExp(requestedGenre, 'i') } // Case-insensitive search
+    })
         .then((results) => {
             return res.json({ data: results });
         })

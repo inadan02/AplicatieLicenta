@@ -9,5 +9,7 @@ router.delete('/books/:id',bookCtrl.deleteBook);
 router.put('/books/:id',bookCtrl.updateBook);
 router.get('/genres', bookCtrl.getAllGenres);
 router.get('/books/genres/:genre',bookCtrl.getBooksByGenre);
+router.get('/books/:minPrice/:maxPrice',bookCtrl.getBooksByPriceRange);
+router.get('/books/prices/:minPrice/:maxPrice/genres/:genre',bookCtrl.getBooksByGenreAndPriceRange);
 
 module.exports=router;
