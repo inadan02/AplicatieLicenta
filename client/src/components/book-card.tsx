@@ -54,7 +54,7 @@ const CenteredCardActions = styled(CardActions)({
 
 
 export const BookCard = ({book}: { book: Book }) => {
-    console.log("BOOOK", book);
+    //console.log("BOOOK", book);
     const navigate = useNavigate();
     const [isInWishlist, setIsInWishlist] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);

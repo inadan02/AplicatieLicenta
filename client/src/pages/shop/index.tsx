@@ -1,19 +1,19 @@
 import {
     Box,
     FormControl,
-    Grid,
+    Grid, InputAdornment,
     InputLabel,
     MenuItem,
     Select,
     SelectChangeEvent,
-    Slider,
-    Typography
+    Slider, TextField
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import {BookCard} from '../../components/book-card'
 import {Book} from "../../shared/types"
 import {styled} from "@mui/system";
-import {Label} from "@mui/icons-material";
+import SearchIcon from '@mui/icons-material/Search';
+//import {Label} from "@mui/icons-material";
 // interface Book{
 //     id:number,
 //     title:string,
@@ -40,6 +40,9 @@ const GridContainer = styled(Box)({
     },
 });
 
+const LeftBox = styled(Box)({
+    width: '200px', // Adjust the width as needed
+});
 const ColoredSlider = styled(Slider)({
     color: 'cadetblue', // Set the color to cadetblue
 });
@@ -58,12 +61,18 @@ const marks = [
 ];
 function ShopPage() {
     const [books, setBooks] = useState<Book[]>([]);
-    const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+   // const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+   // const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
     const [genres, setGenres] = useState<string[]>([]);
     //TODO replace with my price
     const [price, setPrice] = React.useState<number[]>([0, 150]);
+    const [searchInput, setSearchInput] = useState<string>('');
+
+    const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchInput(event.target.value);
+    };
+
 
     useEffect(() => {
         fetch('http://localhost:3000/genres')
@@ -118,7 +127,12 @@ function ShopPage() {
                 const data = await response.json();
 
                 if (Array.isArray(data.data)) {
-                    setBooks(data.data);
+                    const filteredBooks = data.data.filter((book:Book) =>
+                        book.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                        book.author.toLowerCase().includes(searchInput.toLowerCase())
+                    );
+                    setBooks(filteredBooks);
+                    //setBooks(data.data);
                 } else {
                     console.error('Data is not an array', data);
                 }
@@ -128,16 +142,16 @@ function ShopPage() {
         };
 
         fetchData();
-    }, [selectedGenre, price]);
+    }, [selectedGenre, price,searchInput]);
 
-    const handleBookClick = (book: Book) => {
-        setSelectedBook(book);
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
+    // const handleBookClick = (book: Book) => {
+    //     setSelectedBook(book);
+    //     setIsModalOpen(true);
+    // };
+    //
+    // const handleCloseModal = () => {
+    //     setIsModalOpen(false);
+    // };
 
     const handleGenreChange = (event: SelectChangeEvent<string>) => {
         setSelectedGenre(event.target.value);
@@ -149,9 +163,24 @@ function ShopPage() {
 
     return (
         <Container>
-            <Box sx={{ marginBottom: 2 }}>
-                <FormControl variant="standard" sx={{ minWidth: 140, marginBottom: 4  }}>
-                    <InputLabel id="genre-select-label" >Filter By Genre</InputLabel>
+            <LeftBox>
+                {/* Content in the left box */}
+                <TextField
+                    label="Search"
+                    variant="outlined"
+                    fullWidth
+                    value={searchInput}
+                    onChange={handleSearchInputChange}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+                <FormControl variant="standard" sx={{ minWidth: 140 }}>
+                    <InputLabel id="genre-select-label">Filter By Genre</InputLabel>
                     <Select
                         labelId="genre-select-label"
                         id="genre-select"
@@ -166,9 +195,6 @@ function ShopPage() {
                         ))}
                     </Select>
                 </FormControl>
-                <Typography variant="subtitle1" gutterBottom sx={{ textAlign: 'left' }}>
-                    Price Range:
-                </Typography>
                 <ColoredSlider
                     getAriaLabel={() => 'Price range'}
                     value={price}
@@ -178,17 +204,16 @@ function ShopPage() {
                     marks={marks}
                     min={0}
                     max={150}
+                    sx={{ marginTop: 2 }}
                 />
-            </Box>
+            </LeftBox>
+
             <GridContainer>
                 {books?.map((book) => (
                     <BookCard key={book._id} book={book} />
                 ))}
             </GridContainer>
-
         </Container>
     );
-
 }
-
 export default ShopPage;
