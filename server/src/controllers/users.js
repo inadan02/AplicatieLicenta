@@ -105,6 +105,26 @@ async function registerUser(req, res, next) {
     }
 }
 
+// async function registerUser(req, res, next) {
+//     const { email, password, name } = req.body;
+//
+//     try {
+//         const user = await User.findOne({ email });
+//         if (user) {
+//             return res.status(400).json({ type: UserErrors.USER_ALREADY_EXISTS });
+//         }
+//
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         const newUser = new User({ email, password: hashedPassword, name });
+//         await newUser.save();
+//
+//         res.json({ message: "User registered successfully" });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// }
+
 async function logInUser(req, res, next) {
     const {email, password} = req.body
     try {

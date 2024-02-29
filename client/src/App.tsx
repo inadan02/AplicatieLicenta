@@ -6,6 +6,7 @@ import {Navbar} from "./components/navbar";
 import LoginPage from "./pages/login";
 import ShopPage from "./pages/shop";
 import BookDetailsPage from "./pages/book-details";
+import AuthPage from "./pages/auth";
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
           <Routes>
               <Route path="/" element={<ShopPage/>} />
               <Route path="/login" element={<LoginPage/>}/>
-              <Route path="/auth"/>
+              <Route path="/auth" element={<AuthPage/>}/>
               <Route path="/user-account"/>
               <Route path="/checkout"/>
               <Route path="/purchased-items"/>

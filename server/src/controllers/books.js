@@ -88,7 +88,7 @@ function updateBook(req, res, next) {
 }
 
 function getAllGenres(req, res, next) {
-    console.log('GET all genres');
+    //console.log('GET all genres');
 
     Book.distinct('genre')
         .then(genres => {

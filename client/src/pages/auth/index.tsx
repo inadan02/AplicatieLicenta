@@ -22,12 +22,7 @@ const InputField = styled('input')({
     marginBottom: '1rem',
     fontSize: '14px', // Adjust font size as needed
 });
-const SubmitButtonContainer = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginTop: '1rem', // Adjust the margin-top for vertical spacing
-});
+
 const SubmitButton = styled('button')({
     width: '50%',
     padding: '0.5rem',
@@ -39,30 +34,9 @@ const SubmitButton = styled('button')({
     marginBottom: '1rem', // Add some space below the button
 });
 
-const CreateAccountButton = styled('button')({
-    width: '50%',
-    padding: '0.5rem',
-    backgroundColor: 'cadetblue',
-    marginTop: '1rem',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-});
-const ErrorModal = styled(Modal)({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-});
 
-const ModalContent = styled('div')({
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '4px',
-    textAlign: 'center',
-});
 
-function LoginPage() {
+function AuthPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false)
@@ -76,18 +50,14 @@ function LoginPage() {
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
     };
-
-    const handleRegister = () => {
-        navigate('/auth');
-    };
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleAuth = async (e: React.FormEvent) => {
         //TODO
         e.preventDefault(); // Prevent the default form submission behavior
 
         //console.log(email, password);
 
         try {
-            const response = await fetch('http://localhost:3000/users/login', {
+            const response = await fetch('http://localhost:3000/users/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json; charset=UTF-8',
@@ -100,38 +70,27 @@ function LoginPage() {
 
             if (!response.ok) {
                 // Handle error responses from the server
-                const errorData = await response.json();
+                //const errorData = await response.json();
 
-                if (response.status === 400 && errorData.type === 'no-user-found') {
-                    //alert('No user found with the provided email and password.');
-                    showError('No user found with the provided email and password.');
-
-                } else if (response.status === 400 && errorData.type === 'wrong-credentials') {
-                    //alert('Wrong credentials.');
-                    showError('Wrong credentials.');
-                } else {
-                    //alert('An error occurred. Please try again later.');
-                    showError('An error occurred. Please try again later.');
-
-
-                }
+                // if (response.status === 400 && errorData.type === 'no-user-found') {
+                //     //alert('No user found with the provided email and password.');
+                //     showError('No user found with the provided email and password.');
+                //
+                // } else if (response.status === 400 && errorData.type === 'wrong-credentials') {
+                //     //alert('Wrong credentials.');
+                //     showError('Wrong credentials.');
+                // } else {
+                //     //alert('An error occurred. Please try again later.');
+                //     showError('An error occurred. Please try again later.');
+                //
+                //
+                // }
                 setEmail('');
                 setPassword('');
                 return;
             }
 
-            const data = await response.json();
-
-            // Assuming the server responds with a structure like { token: 'your_token_value', userID: 'user_id' }
-            const {token, userID} = data;
-
-            // Save the token to local storage
-            localStorage.setItem('Token', token);
-
-            // Optionally, you may want to save the user ID or perform other actions
-
-            // Redirect or navigate to another page after successful login
-            navigate('/');
+            navigate('/login');
         } catch (error) {
             console.error(error);
             //alert('An unexpected error occurred. Please try again later.');
@@ -155,7 +114,7 @@ function LoginPage() {
 
     return (
         <Container>
-            <h2>Login Page</h2>
+            <h2>Create a new account</h2>
             <Form noValidate>
                 <InputField
                     type="text"
@@ -169,10 +128,7 @@ function LoginPage() {
                     value={password}
                     onChange={handlePasswordChange}
                 />
-                <SubmitButtonContainer>
-                    <SubmitButton onClick={handleLogin}>Login</SubmitButton>
-                    <CreateAccountButton onClick={handleRegister}>Create new account</CreateAccountButton>
-                </SubmitButtonContainer>
+                <SubmitButton onClick={handleAuth}>Register</SubmitButton>
             </Form>
 
             {isErrorAlertOpen && (
@@ -184,4 +140,4 @@ function LoginPage() {
     );
 }
 
-export default LoginPage;
+export default AuthPage;

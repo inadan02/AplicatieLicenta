@@ -34,9 +34,10 @@ const Container = styled(Grid)(({ theme }) => ({
 const GridContainer = styled(Box)({
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-    gap: '30px',
+    gap: '15px',
     '& > *:nth-child(n)': {
-        marginLeft: '50px', // Adjust the value as needed
+        marginLeft: '50px',
+        marginBottom: '20px'
     },
 });
 
@@ -68,6 +69,7 @@ function ShopPage() {
     //TODO replace with my price
     const [price, setPrice] = React.useState<number[]>([0, 150]);
     const [searchInput, setSearchInput] = useState<string>('');
+
 
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchInput(event.target.value);

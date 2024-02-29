@@ -1,35 +1,34 @@
-import {Link, useNavigate} from "react-router-dom";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {useNavigate} from "react-router-dom";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
-import {AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography} from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
-import {useEffect, useState} from "react";
-import {Book} from "../shared/types";
+import {AppBar, Box, IconButton, Toolbar, Tooltip} from "@mui/material";
+
 
 export const Navbar = () => {
     const navigate = useNavigate();
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [genres, setGenres] = useState<string[]>([]);
+    //const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    //const [genres, setGenres] = useState<string[]>([]);
     //const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetch('http://localhost:3000/genres')
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                if (Array.isArray(data.data)) {
-                    setGenres(data.data);
-                } else {
-                    console.error('Data is not an array', data);
-                }
-            })
-            .catch((error) => console.error(error));
-    }, []);
+
+    //AM COMENTAT ASTA, NU CRED CA TREBUIE TODO
+    // useEffect(() => {
+    //     fetch('http://localhost:3000/genres')
+    //         .then((response) => {
+    //             if (!response.ok) {
+    //                 throw new Error('Network response was not ok');
+    //             }
+    //             return response.json();
+    //         })
+    //         .then((data) => {
+    //             if (Array.isArray(data.data)) {
+    //                 setGenres(data.data);
+    //             } else {
+    //                 console.error('Data is not an array', data);
+    //             }
+    //         })
+    //         .catch((error) => console.error(error));
+    // }, []);
 
 
     const handleOpenWishlist = () => {
@@ -129,7 +128,7 @@ export const Navbar = () => {
                 {/*    ))}*/}
                 {/*</Menu>*/}
                 <IconButton size="large" edge="start" color="inherit" onClick={handleViewShop} sx={{mr: 2}}>
-                    Books
+                    NkdBooks
                 </IconButton>
                 <Tooltip title="My wishlist">
                     <IconButton color="inherit" onClick={handleOpenWishlist} sx={{marginLeft: 'auto'}}>
