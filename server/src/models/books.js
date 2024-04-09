@@ -31,9 +31,11 @@ const bookSchema=new Schema({
     description:{
         type:String,
     },
+    owner:{
+        type:String,
+    },
 },{timestamps:{currentTime:()=>new Date().getTime()}})
 
 module.exports=mongoose.model('modelBook',bookSchema,'Books')//collection=tabela in mongo//modelBook e tipul cu care o sa ma refer cand creez un book
 
 
-//la users la cart vine items si in el am Book:{type:modelBook, require:true}

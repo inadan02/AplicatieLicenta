@@ -25,8 +25,16 @@ const userSchema=new Schema({
         // }]
         books: [{
             book: {
+                type: String
+            },
+            quantity:{ type: Number}
+        }]
+    },
+    wishlist:{
+        books: [{
+            book: {
                 type: Schema.Types.ObjectId,
-                ref: 'modelBook', // Replace 'Book' with the actual model name for books
+                ref: 'modelBook',
             }
         }]
     },

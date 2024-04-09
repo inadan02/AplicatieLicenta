@@ -1,6 +1,7 @@
 const NextFunction=require('express');
 
 const User=require('../models/users');
+const Book =require('../models/books');
 const bcrypt=require('bcrypt')
 const UserErrors=require('../errors')
 const jwt=require('jsonwebtoken')
@@ -11,6 +12,9 @@ module.exports.deleteUser=deleteUser;
 module.exports.updateUser=updateUser;
 module.exports.registerUser=registerUser;
 module.exports.logInUser=logInUser;
+module.exports.updateBasketUser=updateBasketUser;
+module.exports.decodeToken=decodeToken;
+module.exports.checkToken=checkToken;
 //module.exports.verifyToken=verifyToken;
 
 function getUsers(req, res, next) {
@@ -86,7 +90,38 @@ function updateUser(req, res, next) {
             res.status(500).json({ error: 'Internal Server Error' });
         });
 }
+async function updateBasketUser(req, res, next) {
+    const userId = req.params.id;
+    const booksToAdd = req.body.bookIds; // This should be an array of objects with bookId and quantity
 
+    try {
+        // Find the user by ID
+        const user = await User.findOne({_id: userId});
+        if (!user) {
+            return res.status(404).json({error: 'User not found'});
+        }
+
+        // Check if booksToAdd is provided and not empty
+        if (booksToAdd && booksToAdd.length) {
+            for (const {bookId, quantity} of booksToAdd) { // Correctly extract bookId and quantity
+                const bookToAdd = await Book.findById(bookId);
+                if (!bookToAdd) {
+                    return res.status(404).json({error: 'Book not found'});
+                }
+                // Add book and quantity to the user's basket
+                user.basket.books.push({book: bookToAdd._id, quantity: quantity});
+            }
+            const updatedUser = await user.save();
+            res.json({data: updatedUser});
+        } else {
+            // Handle case where booksToAdd is empty or not provided
+            res.status(400).json({error: 'No books provided to add'});
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
 async function registerUser(req, res, next) {
     const {email, password} = req.body
 
@@ -146,17 +181,87 @@ async function logInUser(req, res, next) {
 }
 
 //middleware
-const verifyToken = (req,res,next) => {
-    const authHeader = req.headers.authorization
-    if(authHeader){
-        jwt.verify(authHeader,"secret", (err)=>{
-            if(err){
-                return res.sendStatus(403)
-            }
-            next()
-        })
-    }
+// const verifyToken = (req,res,next) => {
+//     const authHeader = req.headers.authorization
+//     if(authHeader){
+//         jwt.verify(authHeader,"secret", (err)=>{
+//             if(err){
+//                 return res.sendStatus(403)
+//             }
+//             next()
+//         })
+//     }
+//
+//     return res.sendStatus(401)//the user is not the correct user so it should not make the request
+// }
 
-    return res.sendStatus(401)//the user is not the correct user so it should not make the request
+
+// function decodeToken(token) {
+//     try {
+//         //return jwt.verify(token.toString(), "secret");
+//         console.log('Decoding token:', token);
+//         const decodedToken = jwt.verify(decodeURIComponent(token), "secret");
+//         console.log('Decoded token:', decodedToken);
+//         return decodedToken;
+//     } catch (error) {
+//         console.error('Error decoding token:', error.message);
+//         return null;
+//     }
+// }
+
+
+function isUrlDecoded(str) {
+    try {
+        return decodeURIComponent(str) === str;
+    } catch (e) {
+        return false;
+    }
+}
+function decodeToken(req,res) {
+    try {
+        const token = req.params.token;
+
+        // Check if the token is URL-decoded
+        const decodedToken = isUrlDecoded(token) ? token : decodeURIComponent(token);
+
+        console.log('Decoding token:', decodedToken);
+
+        // Use jsonwebtoken's decode function to get the token payload without verification
+        const decodedPayload = jwt.decode(decodedToken);
+
+        console.log('Decoded token:', decodedPayload);
+       // return decodedPayload;
+        res.json({ decodedPayload });
+    } catch (error) {
+        console.error('Error decoding token:', error.message);
+        //return null;
+        res.status(500).json({ error: 'Error decoding token' });
+    }
 }
 
+function checkToken(req, res) {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(401).json({ error: 'Authorization header is missing' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Bearer token is missing' });
+        }
+
+        jwt.verify(token, 'secret', (err, decoded) => {
+            if (err) {
+                console.error('Error verifying token:', err);
+                return res.status(403).json({ error: 'Token verification failed' });
+            }
+            // If verification succeeds, decoded contains the token payload
+            console.log('Token verified:', decoded);
+            res.status(200).json({ message: 'Token verified', decoded });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}

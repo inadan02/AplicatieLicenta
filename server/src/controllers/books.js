@@ -4,10 +4,13 @@ module.exports.getBookById=getBookById;
 module.exports.createBook=createBook;
 module.exports.deleteBook=deleteBook;
 module.exports.updateBook=updateBook;
+module.exports.decrementBookQuantity = decrementBookQuantity;
 module.exports.getAllGenres=getAllGenres;
 module.exports.getBooksByGenre = getBooksByGenre;
 module.exports.getBooksByPriceRange = getBooksByPriceRange;
 module.exports.getBooksByGenreAndPriceRange = getBooksByGenreAndPriceRange;
+
+
 
 
 
@@ -86,6 +89,45 @@ function updateBook(req, res, next) {
             res.status(500).json({ error: 'Internal Server Error' });
         });
 }
+function decrementBookQuantity(req, res, next) {
+    const bookId = req.params.id;
+
+    // Check if the request includes a quantity to decrement
+    if (req.body.quantity !== undefined) {
+        // Find the book by ID to get the initial stock value
+        Book.findById(bookId)
+            .then(book => {
+                if (!book) {
+                    return res.status(404).json({ error: 'Book not found' });
+                }
+
+                // Check if the quantity to decrement is greater than the current stock
+                if (req.body.quantity > book.stock) {
+                    return res.status(400).json({ error: 'Quantity to decrement exceeds current stock' });
+                }
+
+                // Calculate the new stock value by subtracting the quantity
+                const newStock = book.stock - req.body.quantity;
+
+                // Update the book with the new stock value
+                return Book.findByIdAndUpdate(bookId, { stock: newStock }, { new: true });
+            })
+            .then(updatedBook => {
+                if (!updatedBook) {
+                    return res.status(404).json({ error: 'Book not found' });
+                }
+                res.json({ data: updatedBook });
+            })
+            .catch(err => {
+                console.log('Error decrementing quantity', err);
+                res.status(500).json({ error: 'Internal Server Error' });
+            });
+    } else {
+        // If no quantity to decrement is provided, return an error
+        res.status(400).json({ error: 'Quantity to decrement not provided' });
+    }
+}
+
 
 function getAllGenres(req, res, next) {
     //console.log('GET all genres');

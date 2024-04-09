@@ -9,5 +9,8 @@ router.delete('/users/:id',userCtrl.deleteUser);
 router.put('/users/:id',userCtrl.updateUser);
 router.post('/users/register', userCtrl.registerUser);
 router.post('/users/login', userCtrl.logInUser);
+router.put('/users/updateBasket/:id', userCtrl.updateBasketUser);
+router.get('/users/decodeJwt/:token', userCtrl.decodeToken);
+router.get('/users/checkJwt/:token', userCtrl.checkToken);
 
 module.exports=router;

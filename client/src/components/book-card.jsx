@@ -5,24 +5,22 @@ import {
     CardActions,
     Button,
     CardActionArea,
-    ButtonProps,
     Dialog,
-    DialogTitle, DialogContent, DialogActions
+    DialogTitle, DialogContent
 } from "@mui/material";
 import CardMedia from '@mui/material/CardMedia';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import {Link, useNavigate} from 'react-router-dom';
 import {Book} from "../shared/types";
 import {styled} from "@mui/system";
 import React, {useState} from "react";
 import {AddShoppingCart} from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 
-const StyledCard = styled(Card)({
-    maxWidth: 350,
-    margin: 3,
-    height: '100%', // Set the height to 100% of the parent container
-});
+// const StyledCard = styled(Card)({
+//     maxWidth: 350,
+//     margin: 3,
+//     height: '100%', // Set the height to 100% of the parent container
+// });
 
 const CardContentWrapper = styled(CardContent)({
     display: 'flex',
@@ -53,12 +51,12 @@ const CenteredCardActions = styled(CardActions)({
 });
 
 
-export const BookCard = ({book}: { book: Book }) => {
+export const BookCard = ({book}) => {
     //console.log("BOOOK", book);
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
     const [isInWishlist, setIsInWishlist] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [disableButton, setDisableButton] = useState(false);
     const handleCardClick = () => {
         console.log(book._id)
         console.dir(book)
@@ -66,10 +64,70 @@ export const BookCard = ({book}: { book: Book }) => {
         setIsModalOpen(true); //pop up for book details
     };
 
-    const handleAddToCart = () => {
-        //handle add to cart
-    }
-    const handleAddToWishlist = (event: React.MouseEvent) => {
+
+    const handleAddToCart = async () => {
+        const existingCart = JSON.parse(localStorage.getItem('cart') ?? '[]');
+        console.log(existingCart)
+
+        const bookFromCart = existingCart.find(item => item.bookId === book._id);
+        console.log(bookFromCart)
+        const bookId = bookFromCart?.bookId
+        //const newDisableButtonValue = book.stock === 0;
+        //setDisableButton(newDisableButtonValue);
+
+
+        if (bookFromCart) {
+            console.log(bookId)
+            const response = await fetch(`http://localhost:3000/books/${bookId}`);
+            if (!response.ok) {
+                console.error(`error: ${bookId}`);
+                return null;
+            }
+            const responseData = await response.json();
+            const stock = responseData?.data?.stock;
+            console.log(stock)
+            if (bookFromCart.quantity >= stock) {
+                alert("Not enough books in stock!")
+            } else {
+                // Increment quantity if book is already in the cart
+                bookFromCart.quantity++;
+            }
+        } else {
+            // Add a new entry with quantity 1 if book is not in the cart
+            existingCart.push({bookId: book._id, quantity: 1});
+        }
+
+        localStorage.setItem('cart', JSON.stringify(existingCart));
+
+        //TODO sa scada automat cu 1 cand adaug in cos si cand scot din cos sa creasca inapoi cu 1
+        //updateQuantityOnServer(book._id, 1);
+    };
+
+    const updateQuantityOnServer = async (bookId, quantityChange) => {
+        try {
+            const response = await fetch(`http://localhost:3000/books/decrementQuantity/${bookId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({quantity: quantityChange}),
+            });
+
+            if (!response.ok) {
+                console.error(`Failed to update quantity for bookId: ${bookId}`);
+                return null;
+            }
+
+            const updatedBook = await response.json();
+            console.log(`Quantity updated for bookId: ${bookId}`, updatedBook);
+            return updatedBook.data;
+        } catch (error) {
+            console.error(`Error updating quantity for bookId: ${bookId}`, error);
+            return null;
+        }
+    };
+
+    const handleAddToWishlist = (event) => {
         event.stopPropagation();
         setIsInWishlist((prevIsInWishlist) => !prevIsInWishlist);
         //navigate('/wishlist')
@@ -79,7 +137,7 @@ export const BookCard = ({book}: { book: Book }) => {
         setIsModalOpen(false);
     };
 
-    const genreImageMap: Record<string, string> = {
+    const genreImageMap = {
         'fiction': 'blue.png',
         'children': 'yellow.png',
         'classic': 'red.png',
@@ -92,6 +150,7 @@ export const BookCard = ({book}: { book: Book }) => {
 
     //TODO when click book open the book page
 
+    // @ts-ignore
     return (
         <div>
             <Card sx={{maxWidth: 345}}>
@@ -142,14 +201,15 @@ export const BookCard = ({book}: { book: Book }) => {
 
             {/* Dialog/Modal for Book Details */}
             <Dialog open={isModalOpen} onClose={handleCloseModal}>
-                <DialogTitle sx={{ textAlign: 'center', borderBottom: '1px solid #ccc' }}>
+                <DialogTitle sx={{textAlign: 'center', borderBottom: '1px solid #ccc'}}>
                     Book Details
-                    <Button onClick={handleCloseModal} sx={{ position: "absolute", right: 0 }}>
-                        <CloseIcon />
+                    <Button onClick={handleCloseModal} sx={{position: "absolute", right: 0}}>
+                        <CloseIcon/>
                     </Button>
                 </DialogTitle>
-                <DialogContent sx={{ textAlign: 'center', padding: '20px' }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold',textAlign: 'center', padding: '20px', color: 'cadetblue' }}>
+                <DialogContent sx={{textAlign: 'center', padding: '20px'}}>
+                    <Typography variant="h6" gutterBottom
+                                sx={{fontWeight: 'bold', textAlign: 'center', padding: '20px', color: 'cadetblue'}}>
                         {book.title}
                     </Typography>
                     <Typography color="textSecondary" gutterBottom>
@@ -169,22 +229,22 @@ export const BookCard = ({book}: { book: Book }) => {
                     </Typography>
                     {/* Add other book details here */}
                 </DialogContent>
-                <DialogActions style={{ justifyContent: 'center', borderTop: '1px solid #ccc' }}>
-                    <Button
-                        size="small"
-                        startIcon={<AddShoppingCart/>}
-                        onClick={handleAddToCart}
-                        disabled={book.stock === 0}
-                        sx={{
-                            color: 'teal',
-                            '&:hover': {
-                                color: 'cadetblue',
-                            },
-                        }}
-                    >
-                        Add to basket
-                    </Button>
-                </DialogActions>
+                {/*<DialogActions style={{ justifyContent: 'center', borderTop: '1px solid #ccc' }}>*/}
+                {/*    <Button*/}
+                {/*        size="small"*/}
+                {/*        startIcon={<AddShoppingCart/>}*/}
+                {/*        onClick={handleAddToCart}*/}
+                {/*        disabled={book.stock === 0}*/}
+                {/*        sx={{*/}
+                {/*            color: 'teal',*/}
+                {/*            '&:hover': {*/}
+                {/*                color: 'cadetblue',*/}
+                {/*            },*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        Add to basket*/}
+                {/*    </Button>*/}
+                {/*</DialogActions>*/}
             </Dialog>
 
         </div>
