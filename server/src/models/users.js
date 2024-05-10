@@ -33,8 +33,7 @@ const userSchema=new Schema({
     wishlist:{
         books: [{
             book: {
-                type: Schema.Types.ObjectId,
-                ref: 'modelBook',
+                type: String
             }
         }]
     },

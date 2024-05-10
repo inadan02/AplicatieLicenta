@@ -1,9 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import {useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import {Button, Paper, Typography } from '@mui/material';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Alert, Button, Paper, Typography} from '@mui/material';
 import {Book} from "../../shared/types";
 import PaymentPopup from './payment-popup';
+import SuccessMessagePopup from "./placed-order-success";
+import {styled} from "@mui/system";
+
+const SubmitButton = styled('button')({
+    width: '10%',
+    padding: '0.5rem',
+    backgroundColor: 'cadetblue',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    marginTop: '1rem',
+});
 
 const BasketPage = () => {
     const [cartItems, setCartItems] = useState<{ bookId: string; quantity: number }[]>([]);
@@ -11,7 +23,10 @@ const BasketPage = () => {
     const navigate = useNavigate();
     const [isBasketEmpty, setIsBasketEmpty] = useState(false);
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
-    //let disableBuyButton=false;
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false); // State for success message
+    const [userLoggedIn, setUserLoggedIn] = useState(false);
+    const [showLoginMessage, setShowLoginMessage] = useState(false);
+
 
     useEffect(() => {
         // Retrieve cart items from localStorage
@@ -19,23 +34,45 @@ const BasketPage = () => {
         if (storedCart) {
             setCartItems(JSON.parse(storedCart));
         }
-        //TODO
-        //pt buton delete book from cart sa dispara si sa se refaca pagina cu totu
     }, []);
 
-    const handleBuy=async () => {
-        //TODO verifica ca userul logat si e userul corect ( token decodat=user care se logheaza la care ii iau id-ul dupa parola si email)
-        // const userId=localStorage.getItem("Token")
-        // const response = await fetch(`http://localhost:3000/users/updateBasket/${userId}`, {
-        //     method: 'PUT',
-        //     headers: {
-        //         'Content-Type': 'application/json; charset=UTF-8',
-        //     },
-        //     body: JSON.stringify({
-        //         //bookId,
-        //         //quantity,
-        //     }),
-        // });
+    useEffect(() => {
+        // Check if user is logged in based on token
+        const token = localStorage.getItem('Token');
+        const checkUserLoggedIn = async () => {
+            try {
+                if (token) {
+                    const response = await fetch(`http://localhost:3000/users/checkJwt/${token}`, {
+                        method: 'GET',
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                    if (response.ok) {
+                        setUserLoggedIn(true);
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking user login:', error);
+            }
+        };
+
+        checkUserLoggedIn();
+    }, []);
+
+    const handleBuy = () => {
+        if (userLoggedIn) {
+            setShowPaymentPopup(true);
+        } else {
+            setShowLoginMessage(true); // Show the login message
+            setTimeout(() => {
+                navigate('/login'); // Redirect to login page after 3 seconds
+            }, 1500);
+        }
+    };
+
+
+    const handlePaymentSuccess = async () => {
         try {
             const token = localStorage.getItem('Token');
             const response = await fetch(`http://localhost:3000/users/checkJwt/${token}`, {
@@ -45,75 +82,55 @@ const BasketPage = () => {
                 },
             });
             if (!token || !response.ok) {
-                // If token is not found, redirect the user to the login page
                 console.error('Token verification failed');
                 navigate('/login');
                 return;
             }
 
-            // Token verification succeeded, continue with the buy process
-            console.log('Token verified successfully');
-
-
             const decodedToken = await response.json();
             const userId = decodedToken.decoded.id;
-            console.log("ID"+ userId)
 
+            const booksToAdd = cartItems.map(item => ({bookId: item.bookId, quantity: item.quantity}));
 
-
-            const booksToAdd = cartItems.map(item => ({ bookId: item.bookId, quantity: item.quantity }));
-
-            // Add books to the user's basket
             const basketResponse = await fetch(`http://localhost:3000/users/updateBasket/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ bookIds: booksToAdd }),
+                body: JSON.stringify({bookIds: booksToAdd}),
             });
             if (!basketResponse.ok) {
                 console.error('Failed to update user basket');
-                // Handle error (show message, redirect, etc.)
                 return;
             }
 
-            // Reduce the quantity of the books in the database
-            for (const { bookId, quantity } of cartItems) {
+            for (const {bookId, quantity} of cartItems) {
                 const decrementResponse = await fetch(`http://localhost:3000/books/decrementQuantity/${bookId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ quantity }),
+                    body: JSON.stringify({quantity}),
                 });
                 if (!decrementResponse.ok) {
                     console.error(`Failed to decrement quantity for bookId: ${bookId}`);
-                    // Handle error (show message, retry, etc.)
                 }
             }
 
-            // Clear cartItems from localStorage
             localStorage.removeItem('cart');
-            setShowPaymentPopup(true);
-
             setCartItems([]);
             setIsBasketEmpty(true);
 
-            //navigate('/confirmation');
+            setShowPaymentPopup(false); // Close the payment popup
+            setShowSuccessMessage(true);
+
+            //navigate('/confirmation'); // Redirect to the confirmation page after successful payment
 
         } catch (error) {
-            console.error('Error verifying token:', error);
-            // Handle token verification failure (redirect to login page, show error message, etc.)
-            //window.location.href = '/login'; // Redirect to login page
+            console.error('Error processing payment:', error);
         }
-    }
-
-    const handlePaymentSuccess = () => {
-        // Called when payment is successfully submitted
-        // You can perform additional actions here if needed
-        setShowPaymentPopup(false); // Close the payment popup
     };
 
     type BookWithNestedData = {
@@ -128,6 +145,7 @@ const BasketPage = () => {
             condition: string;
         };
     };
+
     const fetchBookDetails = async (bookId: string): Promise<Book | null> => {
         try {
             const response = await fetch(`http://localhost:3000/books/${bookId}`);
@@ -154,10 +172,6 @@ const BasketPage = () => {
         fetchData();
     }, [cartItems]);
 
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
     return (
         <div>
             <Typography variant="h4" gutterBottom>
@@ -167,15 +181,21 @@ const BasketPage = () => {
                 <Typography>Your basket is empty.</Typography>
             ) : (
                 bookDetails.map((bookDetail, index) => (
-                    <Paper key={index} elevation={3} style={{ padding: '1rem', marginBottom: '1rem' }}>
+                    <Paper key={index} elevation={3} style={{padding: '1rem', marginBottom: '1rem'}}>
                         <Typography variant="h6">{`${bookDetail?.title || 'N/A'}`}</Typography>
                         <Typography>{`Author: ${bookDetail?.author || 'N/A'}`}</Typography>
                         <Typography>{`Quantity: ${cartItems[index].quantity}`}</Typography>
                     </Paper>
                 ))
             )}
-            {cartItems.length > 0 && <Button onClick={handleBuy}>Buy</Button>}
+            {cartItems.length > 0 && <SubmitButton onClick={handleBuy}>Buy</SubmitButton>}
             <PaymentPopup open={showPaymentPopup} onClose={() => setShowPaymentPopup(false)} onSuccess={handlePaymentSuccess} />
+            <SuccessMessagePopup open={showSuccessMessage} onClose={() => setShowSuccessMessage(false)} />
+            {showLoginMessage && (
+                <Alert severity="info" onClose={() => setShowLoginMessage(false)}>
+                    You must be logged in to buy books. Please log in or sign up.
+                </Alert>
+            )}
         </div>
     );
 };

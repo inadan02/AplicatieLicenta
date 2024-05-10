@@ -2,6 +2,7 @@ import {useNavigate} from "react-router-dom";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import {AppBar, Box, IconButton, Toolbar, Tooltip} from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 
 
 export const Navbar = () => {
@@ -43,6 +44,10 @@ export const Navbar = () => {
 
     const handleViewShop = () => {
         navigate(`/`);
+    }
+
+    const handleOpenAddBook = () => {
+        navigate(`/add-book`);
     }
 
     // const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -130,8 +135,13 @@ export const Navbar = () => {
                 <IconButton size="large" edge="start" color="inherit" onClick={handleViewShop} sx={{mr: 2}}>
                     NkdBooks
                 </IconButton>
+                <Tooltip title="Add book">
+                    <IconButton color="inherit" onClick={handleOpenAddBook} sx={{marginLeft: 'auto'}}>
+                        <AddIcon/>
+                    </IconButton>
+                </Tooltip>
                 <Tooltip title="My wishlist">
-                    <IconButton color="inherit" onClick={handleOpenWishlist} sx={{marginLeft: 'auto'}}>
+                    <IconButton color="inherit" onClick={handleOpenWishlist} >
                         <FavoriteIcon/>
                     </IconButton>
                 </Tooltip>

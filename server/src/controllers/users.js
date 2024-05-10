@@ -15,6 +15,8 @@ module.exports.logInUser=logInUser;
 module.exports.updateBasketUser=updateBasketUser;
 module.exports.decodeToken=decodeToken;
 module.exports.checkToken=checkToken;
+module.exports.addToWishlist=addToWishlist;
+module.exports.getUserWishlist=getUserWishlist;
 //module.exports.verifyToken=verifyToken;
 
 function getUsers(req, res, next) {
@@ -48,6 +50,8 @@ function getUsersById(req,res,next) {
             res.status(500).json({ error: 'Internal Server Error' });
         });
 }
+
+
 
 function createUser(req,res,next) {
     const user=new User(req.body);
@@ -122,6 +126,38 @@ async function updateBasketUser(req, res, next) {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
+
+async function addToWishlist(req, res, next) {
+    const userId = req.params.id;
+    const bookId = req.body.bookId;
+
+    try {
+        // Find the user by ID
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (bookId) {
+            const bookToAdd = await Book.findById(bookId);
+            if (!bookToAdd) {
+                return res.status(404).json({ error: 'Book not found' });
+            }
+            // Add book to the user's wishlist
+            user.wishlist.books.push({book: bookToAdd._id});
+            const updatedUser = await user.save();
+            res.json({ data: updatedUser });
+        } else {
+            // Handle case where bookId is not provided
+            res.status(400).json({ error: 'No book provided to add' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
 async function registerUser(req, res, next) {
     const {email, password} = req.body
 
@@ -263,5 +299,21 @@ function checkToken(req, res) {
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+async function getUserWishlist(req, res, next) {
+    const userId = req.params.id;
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        return res.json({ data: user.wishlist });
+    } catch (error) {
+        console.log('Error', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 }

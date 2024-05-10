@@ -45,9 +45,29 @@ function getBookById(req,res,next){
         });
 }
 
-function createBook(req,res,next) {
-    const book=new Book(req.body);
-    console.log('book',book);
+// function createBook(req,res,next) {
+//     const book=new Book(req.body);
+//     console.log('book',book);
+//     book.save()
+//         .then(result => {
+//             return res.json({ data: result });
+//         })
+//         .catch(error => {
+//             console.log('Error', error);
+//             return res.status(400).json({ error: 'Error creating book' });
+//         });
+// }
+
+function createBook(req, res, next) {
+    // Extract the user ID from the request body
+    const { userId, ...bookData } = req.body;
+
+    // Create a new book object with the provided data
+    const book = new Book({ ...bookData, owner: userId });
+
+    console.log('book', book);
+
+    // Save the book to the database
     book.save()
         .then(result => {
             return res.json({ data: result });
@@ -57,6 +77,7 @@ function createBook(req,res,next) {
             return res.status(400).json({ error: 'Error creating book' });
         });
 }
+
 
 
 function deleteBook(req,res,next) {

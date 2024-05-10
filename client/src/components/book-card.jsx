@@ -12,9 +12,11 @@ import CardMedia from '@mui/material/CardMedia';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import {Book} from "../shared/types";
 import {styled} from "@mui/system";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {AddShoppingCart} from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
+import AddToWishlistButton from "../pages/wishlist/wishlist-button";
+import {useNavigate} from "react-router-dom";
 
 // const StyledCard = styled(Card)({
 //     maxWidth: 350,
@@ -57,6 +59,56 @@ export const BookCard = ({book}) => {
     const [isInWishlist, setIsInWishlist] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [disableButton, setDisableButton] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Fetch and update the user's wishlist when the component mounts
+        fetchWishlist();
+    }, []);
+
+    const fetchWishlist = async () => {
+        try {
+            const token = localStorage.getItem('Token');
+            const responseToken = await fetch(`http://localhost:3000/users/checkJwt/${token}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!token || !responseToken.ok) {
+                console.error('Token verification failed');
+                //navigate('/login');
+                return;
+            }
+
+            const decodedToken = await responseToken.json();
+            const userId = decodedToken.decoded.id;
+            const response = await fetch(`http://localhost:3000/users/getUserWishlist/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                },
+            });
+            //console.log(response)
+            if (response.ok) {
+                const wishlistData = await response.json();
+                console.log(wishlistData)
+                //console.log('Type of wishlistData:', typeof wishlistData);
+                const wishlistArray = wishlistData.data.books;
+                console.log(wishlistArray)
+                console.log('Type of wishlistArray:', typeof wishlistArray);
+                //wishlistArray(wishlistData.includes(book._id));
+                const isInWishlistBoolean = wishlistArray.some(item => item.book === book._id);
+                setIsInWishlist(isInWishlistBoolean)
+                console.log('Is in wishlist:', isInWishlistBoolean);
+            } else {
+                console.error('Failed to fetch wishlist:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching wishlist:', error);
+        }
+    };
+
     const handleCardClick = () => {
         console.log(book._id)
         console.dir(book)
@@ -127,10 +179,48 @@ export const BookCard = ({book}) => {
         }
     };
 
-    const handleAddToWishlist = (event) => {
+    const handleAddToWishlist = async (event, bookId) => {
         event.stopPropagation();
-        setIsInWishlist((prevIsInWishlist) => !prevIsInWishlist);
+        //setIsInWishlist((prevIsInWishlist) => !prevIsInWishlist);
         //navigate('/wishlist')
+        try {
+            const token = localStorage.getItem('Token');
+            const responseToken = await fetch(`http://localhost:3000/users/checkJwt/${token}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!token || !responseToken.ok) {
+                console.error('Token verification failed');
+                navigate('/login');
+                return;
+            }
+
+            const decodedToken = await responseToken.json();
+            const userId = decodedToken.decoded.id;
+            console.log(book._id)
+            console.log(bookId)
+            console.log(userId)
+
+            const response = await fetch(`http://localhost:3000/users/addToWishlist/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify({bookId}),
+            });
+
+            if (response.ok) {
+                setIsInWishlist(true);
+                // Handle success, e.g., show a success message
+            } else {
+                // Handle error response
+                console.error('Failed to add to wishlist:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error adding to wishlist:', error);
+        }
     }
 
     const handleCloseModal = () => {
@@ -163,7 +253,7 @@ export const BookCard = ({book}) => {
                             alt="book"
                             style={{width: '100%', height: '100%', objectFit: 'cover'}}
                         />
-                        <HeartIcon onClick={(event) => handleAddToWishlist(event)}
+                        <HeartIcon onClick={(event) => handleAddToWishlist(event, book._id)}
                                    style={{color: isInWishlist ? 'red' : 'grey'}}/>
                     </ImageWrapper>
                     <CardContentWrapper>
