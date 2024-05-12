@@ -10,6 +10,7 @@ router.put('/books/:id',bookCtrl.updateBook);
 router.put('/books/decrementQuantity/:id', bookCtrl.decrementBookQuantity);
 router.get('/genres', bookCtrl.getAllGenres);
 router.get('/books/genres/:genre',bookCtrl.getBooksByGenre);
+router.get('/books/recommend/:genre',bookCtrl.recommendBooksByGenreAndStockNotNull);
 router.get('/books/:minPrice/:maxPrice',bookCtrl.getBooksByPriceRange);
 router.get('/books/prices/:minPrice/:maxPrice/genres/:genre',bookCtrl.getBooksByGenreAndPriceRange);
 

@@ -17,6 +17,18 @@ const SubmitButton = styled('button')({
     marginTop: '1rem',
 });
 
+const TotalPriceContainer = styled('div')({
+    textAlign: 'center',
+    marginTop: '1rem',
+});
+
+const TotalPrice = styled(Typography)({
+    fontWeight: 'bold',
+    fontSize: '1.2rem',
+    display: 'inline-flex',
+    alignItems: 'center',
+});
+
 const BasketPage = () => {
     const [cartItems, setCartItems] = useState<{ bookId: string; quantity: number }[]>([]);
     const [bookDetails, setBookDetails] = useState<Book[]>([]);
@@ -26,7 +38,7 @@ const BasketPage = () => {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false); // State for success message
     const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [showLoginMessage, setShowLoginMessage] = useState(false);
-
+    const [totalPrice, setTotalPrice] = useState(0);
 
     useEffect(() => {
         // Retrieve cart items from localStorage
@@ -172,6 +184,17 @@ const BasketPage = () => {
         fetchData();
     }, [cartItems]);
 
+    useEffect(() => {
+        // Calculate total price
+        let totalPrice = 0;
+        bookDetails.forEach((book, index) => {
+            if (book) {
+                totalPrice += book.price * cartItems[index].quantity;
+            }
+        });
+        setTotalPrice(totalPrice);
+    }, [bookDetails, cartItems]);
+
     return (
         <div>
             <Typography variant="h4" gutterBottom>
@@ -188,6 +211,9 @@ const BasketPage = () => {
                     </Paper>
                 ))
             )}
+            <TotalPriceContainer>
+                <TotalPrice variant="h6">Total: ${totalPrice.toFixed(2)}</TotalPrice>
+            </TotalPriceContainer>
             {cartItems.length > 0 && <SubmitButton onClick={handleBuy}>Buy</SubmitButton>}
             <PaymentPopup open={showPaymentPopup} onClose={() => setShowPaymentPopup(false)} onSuccess={handlePaymentSuccess} />
             <SuccessMessagePopup open={showSuccessMessage} onClose={() => setShowSuccessMessage(false)} />

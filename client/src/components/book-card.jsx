@@ -54,7 +54,7 @@ const CenteredCardActions = styled(CardActions)({
 
 
 export const BookCard = ({book}) => {
-    //console.log("BOOOK", book);
+    console.log("BOOOK", book);
     //const navigate = useNavigate();
     const [isInWishlist, setIsInWishlist] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -181,8 +181,6 @@ export const BookCard = ({book}) => {
 
     const handleAddToWishlist = async (event, bookId) => {
         event.stopPropagation();
-        //setIsInWishlist((prevIsInWishlist) => !prevIsInWishlist);
-        //navigate('/wishlist')
         try {
             const token = localStorage.getItem('Token');
             const responseToken = await fetch(`http://localhost:3000/users/checkJwt/${token}`, {
@@ -199,29 +197,47 @@ export const BookCard = ({book}) => {
 
             const decodedToken = await responseToken.json();
             const userId = decodedToken.decoded.id;
-            console.log(book._id)
-            console.log(bookId)
-            console.log(userId)
 
-            const response = await fetch(`http://localhost:3000/users/addToWishlist/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                },
-                body: JSON.stringify({bookId}),
-            });
+            if (isInWishlist) {
+                // Book is already in the wishlist, so remove it
+                const response = await fetch(`http://localhost:3000/users/removeFromWishlist/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify({bookId}),
+                });
 
-            if (response.ok) {
-                setIsInWishlist(true);
-                // Handle success, e.g., show a success message
+                if (response.ok) {
+                    setIsInWishlist(false);
+                    // Handle success, e.g., show a success message
+                } else {
+                    // Handle error response
+                    console.error('Failed to remove from wishlist:', response.statusText);
+                }
             } else {
-                // Handle error response
-                console.error('Failed to add to wishlist:', response.statusText);
+                // Book is not in the wishlist, so add it
+                const response = await fetch(`http://localhost:3000/users/addToWishlist/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify({bookId}),
+                });
+
+                if (response.ok) {
+                    setIsInWishlist(true);
+                    // Handle success, e.g., show a success message
+                } else {
+                    // Handle error response
+                    console.error('Failed to add to wishlist:', response.statusText);
+                }
             }
         } catch (error) {
-            console.error('Error adding to wishlist:', error);
+            console.error('Error adding/removing to/from wishlist:', error);
         }
     }
+
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -238,7 +254,6 @@ export const BookCard = ({book}) => {
     // Get the image URL based on the genre
     const genreImageURL = genreImageMap[book.genre] || 'purple.png';
 
-    //TODO when click book open the book page
 
     // @ts-ignore
     return (

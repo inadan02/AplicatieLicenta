@@ -7,12 +7,9 @@ module.exports.updateBook=updateBook;
 module.exports.decrementBookQuantity = decrementBookQuantity;
 module.exports.getAllGenres=getAllGenres;
 module.exports.getBooksByGenre = getBooksByGenre;
+module.exports.recommendBooksByGenreAndStockNotNull = recommendBooksByGenreAndStockNotNull;
 module.exports.getBooksByPriceRange = getBooksByPriceRange;
 module.exports.getBooksByGenreAndPriceRange = getBooksByGenreAndPriceRange;
-
-
-
-
 
 function getBooks(req,res,next){
     console.log('GET books');
@@ -178,7 +175,22 @@ function getBooksByGenre(req, res, next) {
             res.status(500).json({ error: 'Internal Server Error' });
         });
 }
+function recommendBooksByGenreAndStockNotNull(req, res, next) {
+    const requestedGenre = req.params.genre;
 
+    // Use a regular expression for case-insensitive search
+    const genreRegex = new RegExp(requestedGenre, 'i');
+
+    // Find books with the same genre and stock not equal to 0
+    Book.find({ genre: genreRegex, stock: { $gt: 0 } })
+        .then((results) => {
+            return res.json({ data: results });
+        })
+        .catch((err) => {
+            console.log('Error', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+}
 function getBooksByPriceRange(req, res, next) {
     const minPrice = req.params.minPrice;
     const maxPrice = req.params.maxPrice;
@@ -230,3 +242,6 @@ function getBooksByGenreAndPriceRange(req, res, next) {
             res.status(500).json({ error: 'Internal Server Error' });
         });
 }
+
+
+

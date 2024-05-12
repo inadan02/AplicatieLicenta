@@ -12,7 +12,9 @@ router.post('/users/register', userCtrl.registerUser);
 router.post('/users/login', userCtrl.logInUser);
 router.put('/users/updateBasket/:id', userCtrl.updateBasketUser);
 router.put('/users/addToWishlist/:id', userCtrl.addToWishlist);
+router.put('/users/removeFromWishlist/:id', userCtrl.removeFromWishlist);
 router.get('/users/decodeJwt/:token', userCtrl.decodeToken);
 router.get('/users/checkJwt/:token', userCtrl.checkToken);
+router.get('/users/all/getTop10Books', userCtrl.getTop10Books);
 
 module.exports=router;

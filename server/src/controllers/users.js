@@ -16,7 +16,9 @@ module.exports.updateBasketUser=updateBasketUser;
 module.exports.decodeToken=decodeToken;
 module.exports.checkToken=checkToken;
 module.exports.addToWishlist=addToWishlist;
+module.exports.removeFromWishlist=removeFromWishlist;
 module.exports.getUserWishlist=getUserWishlist;
+module.exports.getTop10Books=getTop10Books;
 //module.exports.verifyToken=verifyToken;
 
 function getUsers(req, res, next) {
@@ -158,6 +160,8 @@ async function addToWishlist(req, res, next) {
 }
 
 
+
+
 async function registerUser(req, res, next) {
     const {email, password} = req.body
 
@@ -175,6 +179,37 @@ async function registerUser(req, res, next) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+
+async function removeFromWishlist(req, res, next) {
+    const userId = req.params.id;
+    const bookId = req.body.bookId;
+
+    try {
+        // Find the user by ID
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (bookId) {
+            const index = user.wishlist.books.findIndex(item => item.book.toString() === bookId);
+            if (index === -1) {
+                return res.status(404).json({ error: 'Book not found in wishlist' });
+            }
+            // Remove the book from the wishlist
+            user.wishlist.books.splice(index, 1);
+            const updatedUser = await user.save();
+            res.json({ data: updatedUser });
+        } else {
+            // Handle case where bookId is not provided
+            res.status(400).json({ error: 'No book provided to remove' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 
 // async function registerUser(req, res, next) {
 //     const { email, password, name } = req.body;
@@ -302,6 +337,42 @@ function checkToken(req, res) {
     }
 }
 
+
+async function getTop10Books(req, res, next) {
+    try {
+        const allBaskets = await User.find({}, 'basket.books'); // Fetch all baskets from all users
+
+        // Flatten the array of arrays of books into a single array of books
+        const allBooks = allBaskets.flatMap(user => user.basket.books);
+
+        // Count the occurrences of each book
+        const bookCounts = allBooks.reduce((acc, book) => {
+            const { book: bookId, quantity } = book;
+            acc[bookId] = (acc[bookId] || 0) + quantity;
+            return acc;
+        }, {});
+
+        // Sort the book counts in descending order and get the top 10
+        const top10Books = Object.entries(bookCounts)
+            .sort(([, countA], [, countB]) => countB - countA)
+            .slice(0, 10);
+
+        // Fetch book details for the top 10 books
+        const top10BooksDetails = await Promise.all(
+            top10Books.map(async ([bookId, quantity]) => {
+                const book = await Book.findById(bookId);
+                return { book, quantity };
+            })
+        );
+
+        res.json({ top10Books: top10BooksDetails });
+    } catch (error) {
+        console.error('Error fetching top 10 books:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
 async function getUserWishlist(req, res, next) {
     const userId = req.params.id;
     try {
@@ -317,3 +388,4 @@ async function getUserWishlist(req, res, next) {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+

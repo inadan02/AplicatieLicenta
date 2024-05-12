@@ -9,6 +9,7 @@ import BookDetailsPage from "./pages/book-details";
 import AuthPage from "./pages/auth";
 import BasketPage from "./pages/basket";
 import AddBookPage from "./pages/add-book";
+import WishlistPage from "./pages/wishlist";
 
 function App() {
     //TODO asta face clear pe local storage cand inchid aplicatia
@@ -36,7 +37,7 @@ function App() {
                     <Route path="/user-account"/>
                     <Route path="/checkout" element={<BasketPage/>}/>
                     <Route path="/purchased-items"/>
-                    <Route path="/wishlist"/>
+                    <Route path="/wishlist" element={<WishlistPage/>}/>
                     <Route path="/add-book" element={<AddBookPage/>}/>
                     <Route path="/books/:id" element={<BookDetailsPage/>}/>
                 </Routes>

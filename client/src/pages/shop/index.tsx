@@ -8,7 +8,7 @@ import {
     SelectChangeEvent,
     Slider, TextField
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {BookCard} from '../../components/book-card'
 import {Book} from "../../shared/types"
 import {styled} from "@mui/system";
@@ -66,10 +66,9 @@ function ShopPage() {
    // const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
     const [genres, setGenres] = useState<string[]>([]);
-    //TODO replace with my price
     const [price, setPrice] = React.useState<number[]>([0, 150]);
     const [searchInput, setSearchInput] = useState<string>('');
-
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchInput(event.target.value);
@@ -163,6 +162,23 @@ function ShopPage() {
         setPrice(newValue as number[]);
     };
 
+    const startSpeechRecognition = () => {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.error('Speech recognition not supported');
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            setSearchInput(transcript);
+        };
+        recognition.start();
+    };
+
+
+
     return (
         <Container>
             <LeftBox>
@@ -176,10 +192,11 @@ function ShopPage() {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <SearchIcon />
+                                <SearchIcon onClick={startSpeechRecognition} style={{ cursor: 'pointer' }} />
                             </InputAdornment>
                         ),
                     }}
+                    inputRef={searchInputRef}
                 />
                 <FormControl variant="standard" sx={{ minWidth: 140 }}>
                     <InputLabel id="genre-select-label">Filter By Genre</InputLabel>
