@@ -85,8 +85,9 @@ export const Navbar = () => {
     const handleLogout = () => {
         setUserLoggedIn(false);
         localStorage.removeItem("Token");
-        window.location.reload();
+
         navigate("/");
+        window.location.reload();
 
     };
 
@@ -238,11 +239,14 @@ export const Navbar = () => {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: 400,
+                width: '80%',
+                maxWidth: 400,
+                maxHeight: 400,
                 bgcolor: 'background.paper',
                 border: '2px solid #000',
                 boxShadow: 24,
                 p: 4,
+                overflowY: 'auto',
             }}>
                 <Typography variant="h6" component="h2" gutterBottom>
                     Top 10 Most Bought Books

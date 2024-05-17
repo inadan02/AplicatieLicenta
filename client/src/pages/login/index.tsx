@@ -131,7 +131,9 @@ function LoginPage() {
             // Optionally, you may want to save the user ID or perform other actions
 
             // Redirect or navigate to another page after successful login
+
             navigate('/');
+            window.location.reload();
         } catch (error) {
             console.error(error);
             //alert('An unexpected error occurred. Please try again later.');
