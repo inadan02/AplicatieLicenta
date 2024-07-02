@@ -20,9 +20,6 @@ const userSchema=new Schema({
         type:String
     },
     basket:{
-        // books:[{
-        //     book: {type: modelBook}
-        // }]
         books: [{
             book: {
                 type: String

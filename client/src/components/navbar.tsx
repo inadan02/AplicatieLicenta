@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
 import StarRateSharpIcon from '@mui/icons-material/StarRateSharp';
 import {useEffect, useState} from "react";
 
@@ -31,29 +32,9 @@ export const Navbar = () => {
     const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [top10Books, setTop10Books] = useState<Top10Book[]>([]);
     const [openModal, setOpenModal] = useState(false);
-    //const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    //const [genres, setGenres] = useState<string[]>([]);
-    //const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
 
 
-    //AM COMENTAT ASTA, NU CRED CA TREBUIE TODO
-    // useEffect(() => {
-    //     fetch('http://localhost:3000/genres')
-    //         .then((response) => {
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then((data) => {
-    //             if (Array.isArray(data.data)) {
-    //                 setGenres(data.data);
-    //             } else {
-    //                 console.error('Data is not an array', data);
-    //             }
-    //         })
-    //         .catch((error) => console.error(error));
-    // }, []);
+
 
     useEffect(() => {
         const token = localStorage.getItem("Token"); // Assuming AuthToken is the token key
@@ -65,12 +46,12 @@ export const Navbar = () => {
     }, []);
 
     const handleOpenWishlist = () => {
-        //handle open wishlist
+
         navigate(`/wishlist`);
     }
 
     const handleOpenBasket = () => {
-        //handle open wishlist
+
         navigate(`/checkout`);
     }
 
@@ -91,6 +72,8 @@ export const Navbar = () => {
 
     };
 
+
+
     const handleGetTop10Books = () => {
         fetch('http://localhost:3000/users/all/getTop10Books')
             .then(response => response.json())
@@ -106,66 +89,11 @@ export const Navbar = () => {
             });
     };
 
-    // const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    //     setAnchorEl(event.currentTarget);
-    // };
+    const handleLogin = () => {
+        setUserLoggedIn(true);
+        navigate(`/login`);
+    }
 
-    // const handleMenuClose = () => {
-    //     setAnchorEl(null);
-    // };
-
-    // const handleGenreSelect = (genre: string) => {
-    //     // Handle the genre selection (you can navigate or filter books based on the selected genre)
-    //     console.log(`Selected genre: ${genre}`);
-    //     setSelectedGenre(genre);
-    //
-    //     //navigate(`/books/genres/${genre}`);
-    //     handleMenuClose();
-    //
-    //     // fetch(`http://localhost:3000/books/genres/${genre}`)
-    //     //     .then((response) => {
-    //     //         if (!response.ok) {
-    //     //             throw new Error('Network response was not ok');
-    //     //         }
-    //     //         return response.json();
-    //     //     })
-    //     //     .then((data) => {
-    //     //         if (Array.isArray(data.data)) {
-    //     //             console.log(data.data)
-    //     //             setGenres(data.data);
-    //     //         } else {
-    //     //             console.error('Data is not an array', data);
-    //     //         }
-    //     //     })
-    //     //     .catch((error) => console.error(error));
-    //     //
-    //     // setSelectedGenre(genre);
-    //     // handleMenuClose();
-    // };
-
-    // return <div className="navbar">
-    //     <div className="navbar-title">
-    //         <h1>
-    //             My Library
-    //         </h1>
-    //     </div>
-    //
-    //     <div className="navbar-links">
-    //         <Link to="/">
-    //             Books
-    //         </Link>
-    //         <Link to="/wishlist">
-    //             <FontAwesomeIcon icon={faHeart}/>
-    //             {/*Wishlist*/}
-    //         </Link>
-    //         <Link to="/checkout">
-    //            <FontAwesomeIcon icon={faShoppingBasket} />
-    //
-    //         </Link>
-    //
-    //     </div>
-    //
-    // </div>
 
     const handleCloseModal = () => {
         setOpenModal(false);
@@ -176,25 +104,7 @@ export const Navbar = () => {
     return <Box sx={{flexGrow: 1}}>
         <AppBar position="static">
             <Toolbar sx={{background: 'cadetblue'}}>
-                {/*<Tooltip title="Genres">*/}
-                {/*    <IconButton*/}
-                {/*        size="large"*/}
-                {/*        edge="start"*/}
-                {/*        color="inherit"*/}
-                {/*        aria-label="menu"*/}
-                {/*        onClick={handleMenuClick}*/}
-                {/*        sx={{mr: 2}}*/}
-                {/*    >*/}
-                {/*        <MenuIcon/>*/}
-                {/*    </IconButton>*/}
-                {/*</Tooltip>*/}
-                {/*<Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>*/}
-                {/*    {genres.map((genre) => (*/}
-                {/*        <MenuItem key={genre} onClick={() => handleGenreSelect(genre)}>*/}
-                {/*            {genre.charAt(0).toUpperCase() + genre.slice(1)}*/}
-                {/*        </MenuItem>*/}
-                {/*    ))}*/}
-                {/*</Menu>*/}
+
                 <IconButton size="large" edge="start" color="inherit" onClick={handleViewShop} sx={{mr: 2}}>
                     NkdBooks
                 </IconButton>
@@ -219,7 +129,14 @@ export const Navbar = () => {
                         <StarRateSharpIcon/>
                     </IconButton>
                 </Tooltip>
-                {userLoggedIn && ( // Render LogoutIcon only if user is logged in
+                {!userLoggedIn && (
+                    <Tooltip title="Login">
+                        <IconButton color="inherit" onClick={handleLogin}>
+                            <LoginIcon/>
+                        </IconButton>
+                    </Tooltip>
+                )}
+                {userLoggedIn && (
                     <Tooltip title="Logout">
                         <IconButton color="inherit" onClick={handleLogout}>
                             <LogoutIcon/>

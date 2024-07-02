@@ -9,11 +9,11 @@ interface SuccessMessagePopupProps {
 
 const SuccessMessagePopup: React.FC<SuccessMessagePopupProps> = ({ open, onClose }) => {
     return (
-        //TODO make it prettier
+
         <Snackbar
             anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             open={open}
-            autoHideDuration={3000} // Hide after 3 seconds
+            autoHideDuration={3000}
             onClose={onClose}
             message="Order placed successfully!"
         />

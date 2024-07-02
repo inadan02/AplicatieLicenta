@@ -81,10 +81,10 @@ function LoginPage() {
         navigate('/auth');
     };
     const handleLogin = async (e: React.FormEvent) => {
-        //TODO
-        e.preventDefault(); // Prevent the default form submission behavior
 
-        //console.log(email, password);
+        e.preventDefault();
+
+
 
         try {
             const response = await fetch('http://localhost:3000/users/login', {
@@ -103,14 +103,14 @@ function LoginPage() {
                 const errorData = await response.json();
 
                 if (response.status === 400 && errorData.type === 'no-user-found') {
-                    //alert('No user found with the provided email and password.');
+
                     showError('No user found with the provided email and password.');
 
                 } else if (response.status === 400 && errorData.type === 'wrong-credentials') {
-                    //alert('Wrong credentials.');
+
                     showError('Wrong credentials.');
                 } else {
-                    //alert('An error occurred. Please try again later.');
+
                     showError('An error occurred. Please try again later.');
 
 
@@ -122,21 +122,19 @@ function LoginPage() {
 
             const data = await response.json();
 
-            // Assuming the server responds with a structure like { token: 'your_token_value', userID: 'user_id' }
+
             const {token, userID} = data;
 
-            // Save the token to local storage
+
             localStorage.setItem('Token', token);
 
-            // Optionally, you may want to save the user ID or perform other actions
 
-            // Redirect or navigate to another page after successful login
 
             navigate('/');
             window.location.reload();
         } catch (error) {
             console.error(error);
-            //alert('An unexpected error occurred. Please try again later.');
+
             showError('An unexpected error occurred. Please try again later.');
 
         }
@@ -146,7 +144,7 @@ function LoginPage() {
         setErrorMessage(message);
         setIsErrorAlertOpen(true);
 
-        // Hide the alert after 3000 milliseconds (3 seconds)
+
         setTimeout(() => {
             setIsErrorAlertOpen(false);
             setErrorMessage('');

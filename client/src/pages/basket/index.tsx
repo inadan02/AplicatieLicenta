@@ -76,9 +76,9 @@ const BasketPage = () => {
         if (userLoggedIn) {
             setShowPaymentPopup(true);
         } else {
-            setShowLoginMessage(true); // Show the login message
+            setShowLoginMessage(true);
             setTimeout(() => {
-                navigate('/login'); // Redirect to login page after 3 seconds
+                navigate('/login');
             }, 1500);
         }
     };
@@ -188,7 +188,7 @@ const BasketPage = () => {
         // Calculate total price
         let totalPrice = 0;
         bookDetails.forEach((book, index) => {
-            if (book) {
+            if (book && cartItems[index]) {
                 totalPrice += book.price * cartItems[index].quantity;
             }
         });
@@ -207,7 +207,7 @@ const BasketPage = () => {
                     <Paper key={index} elevation={3} style={{padding: '1rem', marginBottom: '1rem'}}>
                         <Typography variant="h6">{`${bookDetail?.title || 'N/A'}`}</Typography>
                         <Typography>{`Author: ${bookDetail?.author || 'N/A'}`}</Typography>
-                        <Typography>{`Quantity: ${cartItems[index].quantity}`}</Typography>
+                        <Typography>{`Quantity: ${cartItems[index]?.quantity || 0}`}</Typography>
                     </Paper>
                 ))
             )}

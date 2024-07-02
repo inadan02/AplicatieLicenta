@@ -18,31 +18,26 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddToWishlistButton from "../pages/wishlist/wishlist-button";
 import {useNavigate} from "react-router-dom";
 
-// const StyledCard = styled(Card)({
-//     maxWidth: 350,
-//     margin: 3,
-//     height: '100%', // Set the height to 100% of the parent container
-// });
 
 const CardContentWrapper = styled(CardContent)({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    height: '200px', // Set the height to 100% of the parent container
+    height: '200px',
 });
 
 const ImageWrapper = styled('div')({
-    flex: 1, // Make the image take up remaining space
-    overflow: 'hidden', // Ensure the image doesn't overflow the wrapper
-    position: 'relative', // Ensure the wrapper is a positioned element
+    flex: 1,
+    overflow: 'hidden',
+    position: 'relative',
 });
 
 const HeartIcon = styled(FavoriteIcon)({
-    position: 'absolute', // Set the heart icon to an absolute position
-    top: 8, // Adjust the top position as needed
-    right: 8, // Adjust the right position as needed
-    color: 'grey', // Set the initial color to grey
-    cursor: 'pointer', // Add cursor pointer for clickability
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    color: 'grey',
+    cursor: 'pointer',
 });
 
 const CenteredCardActions = styled(CardActions)({
@@ -54,8 +49,7 @@ const CenteredCardActions = styled(CardActions)({
 
 
 export const BookCard = ({book}) => {
-    console.log("BOOOK", book);
-    //const navigate = useNavigate();
+    //console.log("BOOOK", book);
     const [isInWishlist, setIsInWishlist] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [disableButton, setDisableButton] = useState(false);
@@ -112,8 +106,8 @@ export const BookCard = ({book}) => {
     const handleCardClick = () => {
         console.log(book._id)
         console.dir(book)
-        //navigate(`/books/${book._id}`); //new age for book details
-        setIsModalOpen(true); //pop up for book details
+        //navigate(`/books/${book._id}`);
+        setIsModalOpen(true);
     };
 
 
@@ -124,8 +118,7 @@ export const BookCard = ({book}) => {
         const bookFromCart = existingCart.find(item => item.bookId === book._id);
         console.log(bookFromCart)
         const bookId = bookFromCart?.bookId
-        //const newDisableButtonValue = book.stock === 0;
-        //setDisableButton(newDisableButtonValue);
+
 
 
         if (bookFromCart) {
@@ -151,8 +144,6 @@ export const BookCard = ({book}) => {
 
         localStorage.setItem('cart', JSON.stringify(existingCart));
 
-        //TODO sa scada automat cu 1 cand adaug in cos si cand scot din cos sa creasca inapoi cu 1
-        //updateQuantityOnServer(book._id, 1);
     };
 
     const updateQuantityOnServer = async (bookId, quantityChange) => {
@@ -227,7 +218,7 @@ export const BookCard = ({book}) => {
 
                 if (response.ok) {
                     setIsInWishlist(true);
-                    // Handle success, e.g., show a success message
+                    // Handle success
                 } else {
                     // Handle error response
                     console.error('Failed to add to wishlist:', response.statusText);
@@ -248,10 +239,10 @@ export const BookCard = ({book}) => {
         'children': 'yellow.png',
         'classic': 'red.png',
         'psychology': 'green.png',
-        // Add more genres as needed
+
     };
 
-    // Get the image URL based on the genre
+
     const genreImageURL = genreImageMap[book.genre] || 'purple.png';
 
 
@@ -304,7 +295,7 @@ export const BookCard = ({book}) => {
                 </CenteredCardActions>
             </Card>
 
-            {/* Dialog/Modal for Book Details */}
+
             <Dialog open={isModalOpen} onClose={handleCloseModal}>
                 <DialogTitle sx={{textAlign: 'center', borderBottom: '1px solid #ccc'}}>
                     Book Details
@@ -332,24 +323,9 @@ export const BookCard = ({book}) => {
                     <Typography color="textSecondary">
                         <strong>Stock:</strong> {book.stock}
                     </Typography>
-                    {/* Add other book details here */}
+
                 </DialogContent>
-                {/*<DialogActions style={{ justifyContent: 'center', borderTop: '1px solid #ccc' }}>*/}
-                {/*    <Button*/}
-                {/*        size="small"*/}
-                {/*        startIcon={<AddShoppingCart/>}*/}
-                {/*        onClick={handleAddToCart}*/}
-                {/*        disabled={book.stock === 0}*/}
-                {/*        sx={{*/}
-                {/*            color: 'teal',*/}
-                {/*            '&:hover': {*/}
-                {/*                color: 'cadetblue',*/}
-                {/*            },*/}
-                {/*        }}*/}
-                {/*    >*/}
-                {/*        Add to basket*/}
-                {/*    </Button>*/}
-                {/*</DialogActions>*/}
+
             </Dialog>
 
         </div>

@@ -51,8 +51,8 @@ function AuthPage() {
         setPassword(e.target.value);
     };
     const handleAuth = async (e: React.FormEvent) => {
-        //TODO
-        e.preventDefault(); // Prevent the default form submission behavior
+
+        e.preventDefault();
 
         //console.log(email, password);
 
@@ -69,22 +69,7 @@ function AuthPage() {
             });
 
             if (!response.ok) {
-                // Handle error responses from the server
-                //const errorData = await response.json();
 
-                // if (response.status === 400 && errorData.type === 'no-user-found') {
-                //     //alert('No user found with the provided email and password.');
-                //     showError('No user found with the provided email and password.');
-                //
-                // } else if (response.status === 400 && errorData.type === 'wrong-credentials') {
-                //     //alert('Wrong credentials.');
-                //     showError('Wrong credentials.');
-                // } else {
-                //     //alert('An error occurred. Please try again later.');
-                //     showError('An error occurred. Please try again later.');
-                //
-                //
-                // }
                 setEmail('');
                 setPassword('');
                 return;
@@ -103,7 +88,7 @@ function AuthPage() {
         setErrorMessage(message);
         setIsErrorAlertOpen(true);
 
-        // Hide the alert after 3000 milliseconds (3 seconds)
+
         setTimeout(() => {
             setIsErrorAlertOpen(false);
             setErrorMessage('');

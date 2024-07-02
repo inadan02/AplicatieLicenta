@@ -42,18 +42,7 @@ function getBookById(req,res,next){
         });
 }
 
-// function createBook(req,res,next) {
-//     const book=new Book(req.body);
-//     console.log('book',book);
-//     book.save()
-//         .then(result => {
-//             return res.json({ data: result });
-//         })
-//         .catch(error => {
-//             console.log('Error', error);
-//             return res.status(400).json({ error: 'Error creating book' });
-//         });
-// }
+
 
 function createBook(req, res, next) {
     // Extract the user ID from the request body

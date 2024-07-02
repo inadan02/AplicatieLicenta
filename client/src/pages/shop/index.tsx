@@ -13,16 +13,7 @@ import {BookCard} from '../../components/book-card'
 import {Book} from "../../shared/types"
 import {styled} from "@mui/system";
 import SearchIcon from '@mui/icons-material/Search';
-//import {Label} from "@mui/icons-material";
-// interface Book{
-//     id:number,
-//     title:string,
-//     author:string,
-//     genre:string,
-//     price:number,
-//     stock:number
-//
-// }
+
 
 const Container = styled(Grid)(({ theme }) => ({
     padding: theme.spacing(2),
@@ -93,23 +84,7 @@ function ShopPage() {
             .catch((error) => console.error(error));
     }, []);
 
-    // useEffect(() => {
-    //     fetch('http://localhost:3000/books')
-    //         .then((response) => {
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then((data) => {
-    //             if (Array.isArray(data.data)) {
-    //                 setBooks(data.data);
-    //             } else {
-    //                 console.error('Data is not an array', data);
-    //             }
-    //         })
-    //         .catch((error) => console.error(error));
-    // }, []);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -145,14 +120,7 @@ function ShopPage() {
         fetchData();
     }, [selectedGenre, price,searchInput]);
 
-    // const handleBookClick = (book: Book) => {
-    //     setSelectedBook(book);
-    //     setIsModalOpen(true);
-    // };
-    //
-    // const handleCloseModal = () => {
-    //     setIsModalOpen(false);
-    // };
+
 
     const handleGenreChange = (event: SelectChangeEvent<string>) => {
         setSelectedGenre(event.target.value);

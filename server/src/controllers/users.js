@@ -3,8 +3,8 @@ const NextFunction=require('express');
 const User=require('../models/users');
 const Book =require('../models/books');
 const bcrypt=require('bcrypt')
-const UserErrors=require('../errors')
 const jwt=require('jsonwebtoken')
+const UserErrors=require('../errors')
 module.exports.getUsers=getUsers;
 module.exports.getUsersById=getUsersById;
 module.exports.createUser=createUser;
@@ -166,7 +166,7 @@ async function registerUser(req, res, next) {
     const {email, password} = req.body
 
     try {
-        const user = await User.findOne({email},{password});///TODO: pot cauta doar dupa email asai?
+        const user = await User.findOne({email},{password});
         if (user) {
             return res.status(400).json({type: UserErrors.USER_ALREADY_EXISTS})
         }
@@ -211,25 +211,7 @@ async function removeFromWishlist(req, res, next) {
 }
 
 
-// async function registerUser(req, res, next) {
-//     const { email, password, name } = req.body;
-//
-//     try {
-//         const user = await User.findOne({ email });
-//         if (user) {
-//             return res.status(400).json({ type: UserErrors.USER_ALREADY_EXISTS });
-//         }
-//
-//         const hashedPassword = await bcrypt.hash(password, 10);
-//         const newUser = new User({ email, password: hashedPassword, name });
-//         await newUser.save();
-//
-//         res.json({ message: "User registered successfully" });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// }
+
 
 async function logInUser(req, res, next) {
     const {email, password} = req.body
@@ -251,34 +233,7 @@ async function logInUser(req, res, next) {
     }
 }
 
-//middleware
-// const verifyToken = (req,res,next) => {
-//     const authHeader = req.headers.authorization
-//     if(authHeader){
-//         jwt.verify(authHeader,"secret", (err)=>{
-//             if(err){
-//                 return res.sendStatus(403)
-//             }
-//             next()
-//         })
-//     }
-//
-//     return res.sendStatus(401)//the user is not the correct user so it should not make the request
-// }
 
-
-// function decodeToken(token) {
-//     try {
-//         //return jwt.verify(token.toString(), "secret");
-//         console.log('Decoding token:', token);
-//         const decodedToken = jwt.verify(decodeURIComponent(token), "secret");
-//         console.log('Decoded token:', decodedToken);
-//         return decodedToken;
-//     } catch (error) {
-//         console.error('Error decoding token:', error.message);
-//         return null;
-//     }
-// }
 
 
 function isUrlDecoded(str) {
@@ -297,15 +252,14 @@ function decodeToken(req,res) {
 
         console.log('Decoding token:', decodedToken);
 
-        // Use jsonwebtoken's decode function to get the token payload without verification
         const decodedPayload = jwt.decode(decodedToken);
 
         console.log('Decoded token:', decodedPayload);
-       // return decodedPayload;
+
         res.json({ decodedPayload });
     } catch (error) {
         console.error('Error decoding token:', error.message);
-        //return null;
+
         res.status(500).json({ error: 'Error decoding token' });
     }
 }

@@ -47,18 +47,14 @@ const DetailsWrapper = styled('div')({
     alignItems: 'center', // Center items horizontally
     justifyContent: 'center', // Center items vertically
 });
-// const ImageWrapper = styled('div')({
-//     flex: 1, // Make the image take up remaining space
-//     overflow: 'hidden', // Ensure the image doesn't overflow the wrapper
-//     position: 'relative', // Ensure the wrapper is a positioned element
-// });
+
 
 const genreImageMap: Record<string, string> = {
     'fiction': 'blue.png',
     'children': 'yellow.png',
     'classic': 'red.png',
     'psychology': 'green.png',
-    // Add more genres as needed
+
 };
 
 const SuccessMessage = styled(Typography)({
