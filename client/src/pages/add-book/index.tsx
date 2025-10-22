@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import RequireLoginMessage from './login-message';
-import { useNavigate } from 'react-router-dom';
-import { Stack, styled } from '@mui/system';
+import {useNavigate} from 'react-router-dom';
+import {Stack, styled} from '@mui/system';
 import {
+    Alert,
     Button,
     FormControl,
     Input,
@@ -10,6 +11,7 @@ import {
     MenuItem,
     Select,
     SelectChangeEvent,
+    Snackbar,
     TextareaAutosize,
     Typography,
 } from '@mui/material';
@@ -29,6 +31,28 @@ const SubmitButton = styled('button')({
     marginTop: '1rem',
 });
 
+const Container = styled('div')({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    backgroundColor: '#f5f5f5',
+});
+
+const FormWrapper = styled('div')({
+    width: '50%',
+    padding: '2rem',
+    backgroundColor: 'white',
+    boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+    borderRadius: '8px',
+});
+
+const ButtonContainer = styled('div')({
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '1rem',
+});
+
 const AddBookPage = () => {
     console.log('Component rendered');
     const [userLoggedIn, setUserLoggedIn] = useState(false);
@@ -42,6 +66,8 @@ const AddBookPage = () => {
         description: '',
         userId: ''
     });
+    const [successMessage, setSuccessMessage] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -68,7 +94,7 @@ const AddBookPage = () => {
     }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         console.log('Input name:', name);
         console.log('Input value:', value);
         setFormData((prevState) => ({
@@ -76,13 +102,11 @@ const AddBookPage = () => {
             [name]: value,
         }));
         console.log('Updated formData:', formData);
-        console.log("AAAAAAAAAAAAA")
     };
 
 
-
     const handleSelectChange = (event: SelectChangeEvent<string>) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         setFormData((prevState) => ({
             ...prevState,
             [name]: value,
@@ -105,17 +129,16 @@ const AddBookPage = () => {
             }
 
 
-
             const decodedToken = await response.json();
             const userId = decodedToken.decoded.id;
 
-            console.log('User ID:', userId);
+            //console.log('User ID:', userId);
             formData.userId = userId;
             setFormData(prevState => ({
                 ...prevState,
                 userId: userId
             }));
-            console.log("DATAAAAA", formData.userId);
+            //console.log("DATAAAAA", formData.userId);
 
             const responseAddBook = await fetch('http://localhost:3000/books', {
                 method: 'POST',
@@ -139,6 +162,19 @@ const AddBookPage = () => {
             if (responseAddBook.ok) {
                 const data = await responseAddBook.json();
                 console.log('Book created:', data);
+                setSuccessMessage('Book added successfully!');
+                setOpenSnackbar(true);
+                // Clear the form fields
+                setFormData({
+                    title: '',
+                    author: '',
+                    genre: '',
+                    price: '',
+                    stock: '',
+                    condition: '',
+                    description: '',
+                    userId: ''
+                });
                 //navigate('/confirmation');
             } else {
                 console.error('Error creating book:', responseAddBook.statusText);
@@ -148,87 +184,105 @@ const AddBookPage = () => {
         }
     };
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
     return (
-        <div>
-            <Typography variant="h4" gutterBottom>
-                Add Your Book
-            </Typography>
-            {userLoggedIn ? (
-                <Stack spacing={2}>
-                    <FormControl fullWidth>
-                        <InputLabel>
-                            Title <RedAsterisk>*</RedAsterisk>
-                        </InputLabel>
-                        <Input type="text" name="title" value={formData.title} onChange={handleInputChange} required />
-                    </FormControl>
-                    <FormControl fullWidth>
-                        <InputLabel>
-                            Author <RedAsterisk>*</RedAsterisk>
-                        </InputLabel>
-                        <Input type="text" name="author" value={formData.author} onChange={handleInputChange} required />
-                    </FormControl>
-                    <FormControl fullWidth>
-                        <InputLabel>
-                            Genre <RedAsterisk>*</RedAsterisk>
-                        </InputLabel>
-                        <Select name="genre" value={formData.genre} onChange={handleSelectChange} required>
-                            <MenuItem value="fantasy">fantasy</MenuItem>
-                            <MenuItem value="sci-fi">sci-fi</MenuItem>
-                            <MenuItem value="mystery">mystery</MenuItem>
-                            <MenuItem value="fiction">fiction</MenuItem>
-                            <MenuItem value="classic">classic</MenuItem>
-                            <MenuItem value="children">children</MenuItem>
-                            <MenuItem value="autobiography">autobiography</MenuItem>
-                            <MenuItem value="psychology">psychology</MenuItem>
-                            <MenuItem value="other">other</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <FormControl fullWidth>
-                        <InputLabel>
-                            Price <RedAsterisk>*</RedAsterisk>
-                        </InputLabel>
-                        <Input
-                            type="number"
-                            name="price"
-                            placeholder="Price"
-                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                            required
-                        />
-                    </FormControl>
-                    <FormControl fullWidth>
-                        <InputLabel>
-                            Stock <RedAsterisk>*</RedAsterisk>
-                        </InputLabel>
-                        <Input
-                            type="number"
-                            name="stock"
-                            placeholder="Stock"
-                            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                            required
-                        />
-                    </FormControl>
-                    <FormControl fullWidth>
-                        <InputLabel>
-                            Condition <RedAsterisk>*</RedAsterisk>
-                        </InputLabel>
-                        <Select name="condition" value={formData.condition} onChange={handleSelectChange} required>
-                            <MenuItem value="new">new</MenuItem>
-                            <MenuItem value="used">used</MenuItem>
-                            <MenuItem value="old">old</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <FormControl fullWidth>
-                        <InputLabel>
-                            Description <RedAsterisk>*</RedAsterisk>
-                        </InputLabel>
-                        <TextareaAutosize minRows={3} name="description" value={formData.description} onChange={handleInputChange} required />
-                    </FormControl>
-                    <SubmitButton onClick={handleAddBook}>Add Book</SubmitButton>
-                </Stack>
-            ) : (
-                <RequireLoginMessage />
-            )}
-        </div>
+        <Container>
+            <FormWrapper>
+                <Typography variant="h4" gutterBottom>
+                    Sell Your Own Book
+                </Typography>
+                {userLoggedIn ? (
+                    <Stack spacing={2}>
+                        <FormControl fullWidth>
+                            <InputLabel>
+                                Title <RedAsterisk>*</RedAsterisk>
+                            </InputLabel>
+                            <Input type="text" name="title" value={formData.title} onChange={handleInputChange}
+                                   required/>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>
+                                Author <RedAsterisk>*</RedAsterisk>
+                            </InputLabel>
+                            <Input type="text" name="author" value={formData.author} onChange={handleInputChange}
+                                   required/>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>
+                                Genre <RedAsterisk>*</RedAsterisk>
+                            </InputLabel>
+                            <Select name="genre" value={formData.genre} onChange={handleSelectChange} required>
+                                <MenuItem value="fantasy">fantasy</MenuItem>
+                                <MenuItem value="sci-fi">sci-fi</MenuItem>
+                                <MenuItem value="mystery">mystery</MenuItem>
+                                <MenuItem value="fiction">fiction</MenuItem>
+                                <MenuItem value="classic">classic</MenuItem>
+                                <MenuItem value="children">children</MenuItem>
+                                <MenuItem value="autobiography">autobiography</MenuItem>
+                                <MenuItem value="psychology">psychology</MenuItem>
+                                <MenuItem value="other">other</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>
+                                Price <RedAsterisk>*</RedAsterisk>
+                            </InputLabel>
+                            <Input
+                                type="number"
+                                name="price"
+                                placeholder="Price"
+                                value={formData.price}
+                                onChange={(e) => setFormData({...formData, price: e.target.value})}
+                                required
+                            />
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>
+                                Stock <RedAsterisk>*</RedAsterisk>
+                            </InputLabel>
+                            <Input
+                                type="number"
+                                name="stock"
+                                placeholder="Stock"
+                                value={formData.stock}
+                                onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                                required
+                            />
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>
+                                Condition <RedAsterisk>*</RedAsterisk>
+                            </InputLabel>
+                            <Select name="condition" value={formData.condition} onChange={handleSelectChange} required>
+                                <MenuItem value="new">new</MenuItem>
+                                <MenuItem value="used">used</MenuItem>
+                                <MenuItem value="old">old</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>
+                                Description <RedAsterisk>*</RedAsterisk>
+                            </InputLabel>
+                            <TextareaAutosize minRows={3} name="description" value={formData.description}
+                                              onChange={handleInputChange} required/>
+                        </FormControl>
+                        <ButtonContainer>
+                            <SubmitButton onClick={handleAddBook}>Add Book</SubmitButton>
+                        </ButtonContainer>
+                    </Stack>
+                ) : (
+                    <RequireLoginMessage/>
+                )}
+                <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                    <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+                        {successMessage}
+                    </Alert>
+                </Snackbar>
+            </FormWrapper>
+        </Container>
     );
 };
 

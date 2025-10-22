@@ -8,7 +8,7 @@ function initMongoose(app) {
     console.log(DB_URL)
     mongoose.connect(DB_URL,{
         useNewUrlParser:true,
-        // useCreateIndex:true, //vechi si nu mai merg
+        // useCreateIndex:true,
         // useFindAndModify:false,
         useUnifiedTopology:true
     });
